@@ -1,0 +1,36 @@
+# VM files (слишком большие)
+*.vdi
+*.vmdk
+*.vhd
+*.ova
+*.ovf
+*.iso
+*.vbox-prev
+Snapshots/
+
+# Секреты и конфиги с паролями
+*.env
+secrets/
+*.key
+*.pem
+passwords.txt
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Логи
+*.log
+logs/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
