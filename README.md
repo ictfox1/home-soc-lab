@@ -53,13 +53,15 @@ graph TD
 
     subgraph Lab ["Изолированная сеть 'soclab' (10.10.10.0/24)"]
         Wazuh["<b>soc-wazuh</b><br>10.10.10.10<br>(SIEM)"]
-        Web["soc-ubuntu-web<br>10.10.10.40<br>(Жертва - Этап 4)"]
-        Kali["soc-kali<br>10.10.10.30<br>(Атакующий - Этап 6)"]
+        Suricata["<b>soc-suricata</b><br>10.10.10.20<br>(IDS)"]
+        Web["<b>soc-ubuntu-web</b><br>10.10.10.40<br>(Жертва / DVWA)"]
+        Kali["soc-kali<br>10.10.10.30<br>(Атакующий - в планах)"]
     end
 
-    SSH -- "Проброс порта 2222 -> 22" --> NAT
+    SSH -- "Проброс портов" --> NAT
     NAT -- "Adapter 1" --> Wazuh
     Wazuh -- "Adapter 2" --> Lab
+    Suricata -. "Анализ трафика<br>(Promiscuous Mode)" .-> Lab
 ```
 
 **Компоненты стенда:**
@@ -121,9 +123,10 @@ Detection → Analysis → Containment → Eradication → Recovery → Lessons 
 - [x] Этап 5: Установка и настройка Wazuh SIEM
 - [x] Этап 6: Установка и настройка Suricata IDS
 - [ ] Этап 7: Интеграция компонентов
-- [ ] Этап 8: Симуляция атак
-- [ ] Этап 9: Расследование инцидентов и маппинг на MITRE ATT&CK
-- [ ] Этап 10: Финальная документация и выводы
+- [ ] Этап 8: Развёртывание Windows-инфраструктуры (AD)
+- [ ] Этап 9: Симуляция атак
+- [ ] Этап 10: Расследование инцидентов и маппинг на MITRE ATT&CK
+- [ ] Этап 11: Финальная документация и выводы
 
 ---
 
@@ -140,10 +143,10 @@ home-soc-lab/
 │   ├── 02-network.md            # Схема сети и адресация
 │   ├── setup/                   # Инструкции по развёртыванию
 │   │   ├── 01-hypervisor.md
-│   │   ├── 02-wazuh.md
-│   │   ├── 03-suricata.md
-│   │   ├── 04-endpoints.md
-│   │   └── 05-attacker.md
+│   │   ├── 02-wazuh-vm-setup.md
+│   │   ├── 03-ubuntu-web.md
+│   │   ├── 04-wazuh-installation.md
+│   │   └── 05-suricata-ids.md
 │   ├── attacks/                 # Описание проведённых атак
 │   │   ├── 01-ssh-bruteforce.md
 │   │   ├── 02-port-scan.md
@@ -172,15 +175,15 @@ home-soc-lab/
 
 ## 🚀 Как воспроизвести
 
-> Инструкция появится после завершения этапа 4. Планируемая структура:
+Для воспроизведения лаборатории необходимо выполнить следующие шаги:
 
-1. Установить VirtualBox и создать изолированный виртуальный свитч
-2. Развернуть `soc-wazuh` и настроить SIEM
-3. Развернуть `soc-suricata` и подключить зеркалирование трафика
-4. Развернуть целевые машины (Ubuntu, Windows Server, Windows 10)
-5. Установить агенты Wazuh на все хосты
-6. Сгенерировать атаки с `soc-kali` по сценариям из `docs/attacks/`
-7. Провести расследование и оформить Incident Report
+1. Установить VirtualBox и создать изолированную сеть soclab (Internal Network).
+2. Развернуть soc-wazuh (Ubuntu Server) и установить Wazuh SIEM (All-in-One).
+3. Развернуть soc-ubuntu-web (клон) и установить LAMP + уязвимое приложение DVWA.
+4. Развернуть soc-suricata (клон) и настроить IDS в режиме Promiscuous Mode.
+5. Подключить агенты Wazuh к целевым машинам.
+6. В планах: Развернуть Windows Server (AD) и Windows 10, настроить логирование событий.
+7. В планах: Симулировать атаки с soc-kali по сценариям из docs/attacks/.
 
 ---
 
