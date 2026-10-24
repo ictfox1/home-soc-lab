@@ -45,23 +45,59 @@
 ## 🏗️ Архитектура
 
 ```mermaid
-graph TD
-    subgraph Host ["Хост (Windows)"]
-        SSH["SSH-клиент<br>(127.0.0.1:2222)"]
-        NAT["VirtualBox NAT"]
+flowchart TD
+    subgraph HOST ["Хост (Windows 10/11) - VirtualBox"]
+        SSH["SSH-клиент"]
     end
 
-    subgraph Lab ["Изолированная сеть 'soclab' (10.10.10.0/24)"]
-        Wazuh["<b>soc-wazuh</b><br>10.10.10.10<br>(SIEM)"]
-        Suricata["<b>soc-suricata</b><br>10.10.10.20<br>(IDS)"]
-        Web["<b>soc-ubuntu-web</b><br>10.10.10.40<br>(Жертва / DVWA)"]
-        Kali["soc-kali<br>10.10.10.30<br>(Атакующий - в планах)"]
+    subgraph NAT ["NAT Network (Интернет)"]
+        NAT_IF1["Adapter 1"]
+        NAT_IF2["Adapter 1"]
+        NAT_IF3["Adapter 1"]
     end
 
-    SSH -- "Проброс портов" --> NAT
-    NAT -- "Adapter 1" --> Wazuh
-    Wazuh -- "Adapter 2" --> Lab
-    Suricata -. "Анализ трафика<br>(Promiscuous Mode)" .-> Lab
+    subgraph LAB ["Internal Network 'soclab' (10.10.10.0/24)"]
+        direction TB
+        Wazuh["<b>soc-wazuh</b><br>10.10.10.10<br>SIEM (Wazuh)"]
+        Suricata["<b>soc-suricata</b><br>10.10.10.20<br>IDS (Suricata)"]
+        Kali["<b>soc-kali</b><br>10.10.10.30<br>Атакующий (Kali)"]
+        Web["<b>soc-ubuntu-web</b><br>10.10.10.40<br>Жертва (DVWA)"]
+        DC["<b>soc-dc</b><br>10.10.10.50<br>Domain Controller"]
+        Win10["<b>soc-win10</b><br>10.10.10.60<br>Рабочая станция"]
+    end
+
+    %% Подключения к NAT
+    SSH -. "Проброс портов" .-> NAT_IF1
+    SSH -. "Проброс портов" .-> NAT_IF2
+    SSH -. "Проброс портов" .-> NAT_IF3
+    
+    NAT_IF1 --> Wazuh
+    NAT_IF2 --> Suricata
+    NAT_IF3 --> Kali
+
+    %% Внутренние взаимодействия (Логика SOC)
+    Wazuh <== "Сбор логов (Агенты)" ==> Suricata
+    Wazuh <== "Сбор логов (Агенты)" ==> Web
+    Wazuh <== "Сбор логов (Агенты)" ==> DC
+    Wazuh <== "Сбор логов (Агенты)" ==> Win10
+
+    Suricata -. "Анализ трафика<br>(Promiscuous Mode)" .-> LAB
+    
+    Kali == "Атаки (Nmap, Hydra)" ==> Web
+    Kali == "Атаки" ==> Win10
+    Kali == "Атаки" ==> DC
+
+    classDef siem fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef ids fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef victim fill:#ffebee,stroke:#c62828,stroke-width:2px;
+    classDef attacker fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef win fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px;
+
+    class Wazuh siem;
+    class Suricata ids;
+    class Web victim;
+    class Kali attacker;
+    class DC,Win10 win;
 ```
 
 **Компоненты стенда:**
