@@ -16,6 +16,7 @@
   <log_format>apache</log_format>
   <location>/var/log/apache2/error.log</location>
 </localfile>
+```
 
 ### 2. Мониторинг целостности файлов (FIM)
 В блок <syscheck> добавлена директория /var/www/html с параметрами:
