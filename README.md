@@ -1,6 +1,6 @@
 # 🛡️ Home SOC Lab
 
-![Status](https://img.shields.io/badge/status-in%20progress-yellow?style=flat-square)
+![Status](https://img.shields.io/badge/status-completed-brightgreen?style=flat-square)
 ![Focus](https://img.shields.io/badge/focus-blue%20team-blue?style=flat-square)
 ![Role](https://img.shields.io/badge/target-SOC%20Analyst-green?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-Wazuh%20%7C%20Suricata%20%7C%20VirtualBox-orange?style=flat-square)
@@ -29,11 +29,12 @@
 
 ## 🎯 Цель проекта
 
-Построить изолированный стенд, имитирующий корпоративную сеть небольшой компании, и на нём отработать навыки, которые требуются от **SOC Analyst L1/L2** и **Blue Team** специалиста:
+Построить изолированный стенд, имитирующий корпоративную сеть небольшой компании, и на нём отработать навыки, которые требуются от **SOC Analyst L1** и **Blue Team** специалиста:
 
 - Централизованный сбор логов с гетерогенной инфраструктуры (Linux + Windows + AD)
-- Написание и тюнинг правил корреляции в SIEM
+- Написание и тюнинг правил корреляции в SIEM (включая кастомные правила)
 - Детектирование сетевых атак через IDS
+- Настройка автоматического реагирования (Active Response)
 - Проведение расследований (triage, timeline, IOC extraction)
 - Маппинг событий на **MITRE ATT&CK**
 - Составление **Incident Report** по методологии **NIST SP 800-61**
@@ -120,10 +121,11 @@ flowchart TD
 | Компонент | Технология | Назначение |
 |-----------|-----------|------------|
 | Гипервизор | **VirtualBox** | Хостинг виртуальных машин |
-| SIEM | **Wazuh** | Сбор логов, корреляция, алертинг, FIM |
+| SIEM | **Wazuh** | Сбор логов, корреляция, алертинг, FIM, Active Response |
 | IDS | **Suricata** | Сигнатурный анализ трафика |
 | Атакующий | **Kali Linux** | Симуляция атак (Nmap, Hydra, Metasploit, Burp) |
 | Целевые ОС | **Ubuntu Server, Windows Server 2022, Windows 10** | Имитация реальной инфраструктуры |
+| Инструменты Windows | **Sysmon, Advanced Audit Policy** | Глубокое логирование процессов и событий |
 | Уязвимое приложение | **DVWA** | Тренировка веб-атак |
 | Маппинг | **MITRE ATT&CK** | Классификация техник атакующих |
 | Методология | **NIST SP 800-61** | Оформление расследований |
@@ -141,7 +143,7 @@ flowchart TD
 
 Отчёты об инцидентах оформляются по фазам **NIST SP 800-61**:
 
-```
+```text
 Detection → Analysis → Containment → Eradication → Recovery → Lessons Learned
 ```
 
@@ -155,45 +157,43 @@ Detection → Analysis → Containment → Eradication → Recovery → Lessons 
 - [x] Этап 1: Планирование архитектуры и создание репозитория
 - [x] Этап 2: Установка и настройка гипервизора
 - [x] Этап 3: Настройка изолированной сети
-- [x] Этап 4: Развёртывание целевых машин
+- [x] Этап 4: Развёртывание целевых машин (Ubuntu Web)
 - [x] Этап 5: Установка и настройка Wazuh SIEM
 - [x] Этап 6: Установка и настройка Suricata IDS
-- [x] Этап 7: Интеграция компонентов
-- [x] Этап 8: Развёртывание Windows-инфраструктуры (AD)
-- [ ] Этап 9: Симуляция атак
-- [ ] Этап 10: Расследование инцидентов и маппинг на MITRE ATT&CK
-- [ ] Этап 11: Финальная документация и выводы
+- [x] Этап 7: Интеграция Suricata и Wazuh
+- [x] Этап 8: Развёртывание Windows-инфраструктуры (DC, Win10)
+- [x] Этап 9: Настройка Sysmon и продвинутого аудита
+- [x] Этап 10: Развёртывание Kali Linux и симуляция атак
+- [x] Этап 11: Расследование инцидентов, тюнинг правил и финализация
 
 ---
 
 ## 📁 Структура репозитория
 
-```
+```text
 home-soc-lab/
 ├── README.md
 ├── LICENSE
 ├── .gitignore
 ├── docs/
-│   ├── 00-architecture.md       # Описание архитектуры стенда
-│   ├── 01-hardware.md           # Требования к железу
-│   ├── 02-network.md            # Схема сети и адресация
 │   ├── setup/                   # Инструкции по развёртыванию
 │   │   ├── 01-hypervisor.md
 │   │   ├── 02-wazuh-vm-setup.md
 │   │   ├── 03-ubuntu-web.md
 │   │   ├── 04-wazuh-installation.md
-│   │   └── 05-suricata-ids.md
-│   ├── attacks/                 # Описание проведённых атак
-│   │   ├── 01-ssh-bruteforce.md
-│   │   ├── 02-port-scan.md
-│   │   └── 03-web-attack.md
+│   │   ├── 05-suricata-ids.md
+│   │   ├── 06-wazuh-suricata-integration.md
+│   │   ├── 07-windows-dc.md
+│   │   ├── 08-windows-client.md
+|   |   ├── 09-ad-users-and-audit.md
+|   |   ├── 10-wazuh-hardening.md
+|   |   ├── 11-ubuntu-web-monitoring.md
+│   │   └── 12-kali-attacker.md
 │   └── incidents/               # Отчёты об инцидентах
-├── configs/
-│   ├── wazuh/                   # Конфиги Wazuh Manager + агентов
-│   ├── suricata/                # Правила и конфиг Suricata
-│   └── virtualbox/              # Настройки сети и ВМ
+│       ├── INC-001-ssh-bruteforce.md
+│       ├── INC-002-web-sqli-scan.md
+│       └── INC-003-win10-suspicious-activity.md
 ├── scripts/                     # Скрипты автоматизации
-├── diagrams/                    # Схемы сети и архитектуры
 └── screenshots/                 # Скриншоты дашбордов и результатов
 ```
 
@@ -203,36 +203,38 @@ home-soc-lab/
 
 | ID | Инцидент | Техника MITRE ATT&CK | Отчёт |
 |----|----------|----------------------|-------|
-| INC-001 | *Будет добавлен после этапа 9* | — | — |
-| INC-002 | — | — | — |
-| INC-003 | — | — | — |
+| **INC-001** | SSH Brute Force (Hydra) и Active Response | `T1110.001` (Brute Force) | [Открыть](docs/incidents/INC-001-ssh-bruteforce.md) |
+| **INC-002** | SQL-инъекция и сетевое сканирование | `T1190`, `T1595` | [Открыть](docs/incidents/INC-002-web-sqli-scan.md) |
+| **INC-003** | Поведение Ransomware (vssadmin) и триаж False Positive | `T1490`, `T1059` | [Открыть](docs/incidents/INC-003-win10-suspicious-activity.md) |
 
 ---
 
 ## 🚀 Как воспроизвести
 
-Для воспроизведения лаборатории необходимо выполнить следующие шаги:
+Для воспроизведения лаборатории необходимо выполнить следующие шаги (детали в папке `docs/setup/`):
 
-1. Установить VirtualBox и создать изолированную сеть soclab (Internal Network).
-2. Развернуть soc-wazuh (Ubuntu Server) и установить Wazuh SIEM (All-in-One).
-3. Развернуть soc-ubuntu-web (клон) и установить LAMP + уязвимое приложение DVWA.
-4. Развернуть soc-suricata (клон) и настроить IDS в режиме Promiscuous Mode.
-5. Подключить агенты Wazuh к целевым машинам.
-6. Развернуть Windows Server (AD) и Windows 10, настроить логирование событий.
-7. В планах: Симулировать атаки с soc-kali по сценариям из docs/attacks/.
+1. Установить VirtualBox и создать изолированную сеть `soclab` (Internal Network).
+2. Развернуть `soc-wazuh` (Ubuntu Server) и установить Wazuh SIEM (All-in-One).
+3. Развернуть `soc-ubuntu-web` (клон) и установить LAMP + уязвимое приложение DVWA.
+4. Развернуть `soc-suricata` (клон) и настроить IDS в режиме Promiscuous Mode, подключить к Wazuh.
+5. Развернуть Windows Server (`soc-dc`), поднять AD, установить Sysmon и Wazuh Agent.
+6. Развернуть Windows 10 (`soc-win10`), ввести в домен, установить Sysmon и Wazuh Agent.
+7. Развернуть Kali Linux (`soc-kali`) и провести симуляцию атак согласно отчетам об инцидентах.
+8. Настроить кастомные правила и Active Response в Wazuh для защиты инфраструктуры.
 
 ---
 
 ## 📚 Чему я научился
 
-*Раздел будет заполнен по окончании проекта. Планируемые темы:*
+В ходе работы над проектом я получил следующие практические навыки:
 
-- Развёртывание и тюнинг Wazuh SIEM под корпоративную инфраструктуру
-- Написание кастомных правил корреляции и снижение false positive
-- Настройка Suricata в режиме IDS с зеркалированием трафика
-- Работа с AD-логами и Windows Event Forwarding
-- Проведение расследования по методологии NIST SP 800-61
-- Маппинг событий на MITRE ATT&CK
+- **Развёртывание и архитектура:** Спроектировал изолированную сеть в VirtualBox, настроил NAT и Internal Network, проброс портов.
+- **SIEM (Wazuh):** Установил Wazuh All-in-One, настроил сбор логов (JSON, EventChannel), разобрался с модулями SCA и FIM (`who-data`).
+- **IDS (Suricata):** Настроил Suricata в режиме Promiscuous Mode, обновил и сконфигурировал правила (Emerging Threats), настроил интеграцию с Wazuh через парсинг `eve.json`.
+- **Windows Security:** Настроил Advanced Audit Policy, Event ID 4688, установил и сконфигурировал Sysmon (SwiftOnSecurity).
+- **Кастомные правила (Rule Tuning):** Научился писать собственные правила корреляции в Wazuh (например, для детекта удаления теневых копий `vssadmin`).
+- **Active Response:** Настроил автоматическую блокировку IP-адресов через `iptables` при детекте SSH-брутфорса.
+- **Incident Response:** Отработал триаж ложных срабатываний (False Positives) и оформление отчетов по методологии NIST SP 800-61 с маппингом на MITRE ATT&CK.
 
 ---
 
